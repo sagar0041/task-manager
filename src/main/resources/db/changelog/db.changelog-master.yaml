@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/001-create-users-table.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/002-create-projects-table.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/003-create-tasks-table.yaml
+      relativeToChangelogFile: false
