@@ -2,7 +2,9 @@ package dev.sagarpatil.taskmanager.controller;
 
 import dev.sagarpatil.taskmanager.dto.CreateTaskRequest;
 import dev.sagarpatil.taskmanager.dto.TaskResponse;
+import dev.sagarpatil.taskmanager.entity.User;
 import dev.sagarpatil.taskmanager.service.TaskService;
+import dev.sagarpatil.taskmanager.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +16,11 @@ import java.util.List;
 public class TaskController {
 
     private final TaskService taskService;
+    private final UserService userService;
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, UserService userService) {
         this.taskService = taskService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -24,8 +28,8 @@ public class TaskController {
             @RequestBody CreateTaskRequest request,
             @AuthenticationPrincipal Jwt jwt) {
 
-        String keycloakId = jwt.getSubject();
-        return taskService.createTask(request, keycloakId);
+        User user = userService.getOrCreateUser(jwt);
+        return taskService.createTask(request, user);
     }
 
     @GetMapping
@@ -35,7 +39,7 @@ public class TaskController {
 
     @GetMapping("/my")
     public List<TaskResponse> getMyTasks(@AuthenticationPrincipal Jwt jwt) {
-        String keycloakId = jwt.getSubject();
-        return taskService.getMyTasks(keycloakId);
+        User user = userService.getOrCreateUser(jwt);
+        return taskService.getMyTasks(user);
     }
 }

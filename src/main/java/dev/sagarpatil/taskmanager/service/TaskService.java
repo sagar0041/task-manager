@@ -30,10 +30,7 @@ public class TaskService {
         this.userRepository = userRepository;
     }
 
-    public TaskResponse createTask(CreateTaskRequest request, String keycloakId) {
-        User createdBy = userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public TaskResponse createTask(CreateTaskRequest request, User createdBy) {
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
@@ -67,10 +64,7 @@ public class TaskService {
                 .toList();
     }
 
-    public List<TaskResponse> getMyTasks(String keycloakId) {
-        User user = userRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public List<TaskResponse> getMyTasks(User user) {
         return taskRepository.findByAssignedTo(user).stream()
                 .map(this::toResponse)
                 .toList();
