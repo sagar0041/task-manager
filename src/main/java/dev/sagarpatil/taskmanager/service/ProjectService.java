@@ -5,6 +5,7 @@ import dev.sagarpatil.taskmanager.dto.ProjectResponse;
 import dev.sagarpatil.taskmanager.entity.Project;
 import dev.sagarpatil.taskmanager.entity.User;
 import dev.sagarpatil.taskmanager.repository.ProjectRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,12 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER') or hasRole('ADMIN')")
     public ProjectResponse createProject(CreateProjectRequest request, User user) {
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authorities: " + auth.getAuthorities());
+
         Project project = Project.builder()
                 .name(request.name())
                 .description(request.description())
