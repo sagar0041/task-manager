@@ -9,6 +9,7 @@ import dev.sagarpatil.taskmanager.entity.User;
 import dev.sagarpatil.taskmanager.repository.ProjectRepository;
 import dev.sagarpatil.taskmanager.repository.TaskRepository;
 import dev.sagarpatil.taskmanager.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class TaskService {
         this.userRepository = userRepository;
     }
 
+    @PreAuthorize("hasRole('PROJECT_MANAGER') or hasRole('ADMIN')")
     public TaskResponse createTask(CreateTaskRequest request, User createdBy) {
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
