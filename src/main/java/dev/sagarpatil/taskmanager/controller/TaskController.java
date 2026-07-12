@@ -2,6 +2,7 @@ package dev.sagarpatil.taskmanager.controller;
 
 import dev.sagarpatil.taskmanager.dto.CreateTaskRequest;
 import dev.sagarpatil.taskmanager.dto.TaskResponse;
+import dev.sagarpatil.taskmanager.entity.TaskStatus;
 import dev.sagarpatil.taskmanager.entity.User;
 import dev.sagarpatil.taskmanager.service.TaskService;
 import dev.sagarpatil.taskmanager.service.UserService;
@@ -41,5 +42,15 @@ public class TaskController {
     public List<TaskResponse> getMyTasks(@AuthenticationPrincipal Jwt jwt) {
         User user = userService.getOrCreateUser(jwt);
         return taskService.getMyTasks(user);
+    }
+
+    @PatchMapping("/{id}/status")
+    public TaskResponse updateTaskStatus(
+            @PathVariable String id,
+            @RequestBody TaskStatus newStatus,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        User user = userService.getOrCreateUser(jwt);
+        return taskService.updateTaskStatus(id, newStatus, user);
     }
 }

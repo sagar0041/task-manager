@@ -10,6 +10,8 @@ import dev.sagarpatil.taskmanager.repository.ProjectRepository;
 import dev.sagarpatil.taskmanager.repository.TaskRepository;
 import dev.sagarpatil.taskmanager.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,5 +88,28 @@ public class TaskService {
                 task.getCreatedAt(),
                 task.getUpdatedAt()
         );
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    public TaskResponse updateTaskStatus(String taskId, TaskStatus newStatus, User currentUser) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isManager = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_PROJECT_MANAGER")
+                        || a.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isAssignee = task.getAssignedTo() != null
+                && task.getAssignedTo().getId().equals(currentUser.getId());
+
+        if (!isManager && !isAssignee) {
+            throw new RuntimeException("Not authorized to update this task");
+        }
+
+        task.setStatus(newStatus);
+        Task savedTask = taskRepository.save(task);
+
+        return toResponse(savedTask);
     }
 }
