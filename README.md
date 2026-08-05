@@ -18,23 +18,7 @@ resource-based authorization.
 
 ## Architecture
 
-```
-┌─────────────┐     tokens      ┌──────────────┐
-│   Angular   │ ──────────────► │   Keycloak   │
-│  (port 4200)│                 │  (port 8180) │
-└──────┬──────┘                 └──────────────┘
-       │ API calls                      ▲
-       ▼ with Bearer token              │ validate token (local, cached public key)
-┌─────────────┐                         │
-│ Spring Boot │ ───────────────────────►│
-│  (port 8080)│
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  PostgreSQL │
-│  (port 5432)│
-└─────────────┘
-```
+![Architecture](docs/architecture_2.svg)
 
 Angular authenticates directly against Keycloak (Authorization Code Flow + PKCE)
 and never sees user credentials. Spring Boot validates JWTs locally using
